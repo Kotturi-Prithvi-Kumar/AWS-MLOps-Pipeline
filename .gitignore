@@ -1,0 +1,21 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Local datasets and downloaded artifacts
+data/
+*.pkl
+*.joblib
+
+# Secrets
+.env
+.env.*
+.aws/
+*.pem
+
+# Editor and OS
+.vscode/
+.DS_Store
+Thumbs.db
