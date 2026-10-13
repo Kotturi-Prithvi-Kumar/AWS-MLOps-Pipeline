@@ -1,21 +1,20 @@
 # Python
 .venv/
+venv/
 __pycache__/
-*.pyc
+*.py[cod]
 .pytest_cache/
 
-# Local datasets and downloaded artifacts
+# Generated datasets
 data/
-*.pkl
-*.joblib
 
-# Secrets
+# Secrets and credentials
 .env
 .env.*
+!.env.example
 .aws/
 *.pem
+*.key
 
-# Editor and OS
+# IDE files
 .vscode/
-.DS_Store
-Thumbs.db
