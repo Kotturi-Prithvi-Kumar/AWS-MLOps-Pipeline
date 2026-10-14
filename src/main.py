@@ -5,6 +5,10 @@ import os
 from pathlib import Path
 
 from src.create_dataset import generate_dataset
+from src.data_validator import (
+    DataValidationError,
+    validate_dataset,
+)
 from src.s3_pipeline import (
     create_s3_client,
     upload_to_s3,
@@ -29,6 +33,24 @@ def run_pipeline(use_aws=False):
         output_path="data/customers.csv",
         num_records=100,
         seed=69,
+    )
+
+    logger.info("Starting dataset validation")
+
+    report = validate_dataset(source)
+
+    if not report["valid"]:
+        for error in report["errors"]:
+            logger.error("Data validation error: %s", error)
+
+        raise DataValidationError(
+            f"Dataset validation failed: "
+            f"{report['error_count']} error(s) detected"
+        )
+
+    logger.info(
+        "Dataset validation passed: %s records checked",
+        report["total_rows"],
     )
 
     if not use_aws:
