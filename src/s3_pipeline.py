@@ -5,17 +5,29 @@ from pathlib import Path
 
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError
+from botocore.config import Config
 
 logger = logging.getLogger(__name__)
 
 
 def create_s3_client(profile="mlops-dev", region="ap-south-1"):
-    """Create an authenticated AWS S3 client."""
+    """Create an S3 client with explicit retry and timeout settings."""
+
+    config = Config(
+        retries={
+            "mode": "standard",
+            "total_max_attempts": 3,
+        },
+        connect_timeout=5,
+        read_timeout=30,
+    )
+
     session = boto3.Session(
         profile_name=profile,
         region_name=region,
     )
-    return session.client("s3")
+
+    return session.client("s3", config=config)
 
 
 def upload_to_s3(s3, source_path, bucket, object_key):
