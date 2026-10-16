@@ -18,3 +18,5 @@ data/
 
 # IDE files
 .vscode/
+# Trained model binaries
+*.joblib
