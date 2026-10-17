@@ -16,6 +16,8 @@ from sklearn.metrics import (
 import json
 import joblib
 from datetime import datetime, timezone
+import hashlib
+import re
 
 
 FEATURE_COLUMNS = [
@@ -91,24 +93,62 @@ def evaluate_model(model, X_test, y_test):
 
     return metrics
 
-def save_model(model, metrics, output_dir="models"):
-    """Save a trained model and its evaluation metadata."""
+def get_next_model_version(output_dir="models"):
+    """Find the next available model version."""
 
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
 
-    model_path = output_path / "churn_model_v1.joblib"
-    metrics_path = output_path / "churn_model_v1_metrics.json"
+    versions = []
+
+    for model_path in output_path.glob("churn_model_v*.joblib"):
+        match = re.fullmatch(
+            r"churn_model_v(\d+)\.joblib",
+            model_path.name,
+        )
+
+        if match:
+            versions.append(int(match.group(1)))
+
+    return max(versions, default=0) + 1
+
+
+def calculate_file_hash(file_path):
+    """Calculate the SHA-256 hash of a file."""
+
+    sha256 = hashlib.sha256()
+
+    with open(file_path, "rb") as file:
+        for chunk in iter(lambda: file.read(8192), b""):
+            sha256.update(chunk)
+
+    return sha256.hexdigest()
+
+def save_model(model, metrics, output_dir="models"):
+    """Save a versioned model and its evaluation metadata."""
+
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    version_number = get_next_model_version(output_path)
+    version = f"v{version_number}"
+
+    model_path = output_path / f"churn_model_{version}.joblib"
+    metrics_path = output_path / f"churn_model_{version}_metrics.json"
 
     joblib.dump(model, model_path)
 
+    model_hash = calculate_file_hash(model_path)
+
     metadata = {
         "model_name": "customer_churn_classifier",
-        "model_version": "v1",
+        "model_version": version,
         "algorithm": type(model).__name__,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "features": FEATURE_COLUMNS,
         "random_state": RANDOM_STATE,
+        "hyperparameters": model.get_params(),
+        "model_sha256": model_hash,
         "metrics": metrics,
     }
 
