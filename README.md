@@ -1,42 +1,66 @@
-# AWS MLOps — S3 Data Pipeline
+## AWS MLOps — Customer Churn Prediction Pipeline
 
-## Overview
+An end-to-end machine learning project covering data ingestion, validation, model training, evaluation, containerization, and AWS deployment.
 
-A Python-based AWS MLOps mini-project demonstrating secure cloud authentication, object storage, and dataset integrity verification.
+### Technology Stack
 
-## Technologies
+Python, Pandas, scikit-learn, FastAPI, Docker, pytest, AWS S3, Amazon ECR, Amazon EC2, IAM, Git, GitHub.
 
-- Python
-- boto3
-- AWS IAM Identity Center
-- Amazon S3
-- Git
+### Architecture
 
-## Features
+Synthetic Customer Dataset → Data Validation → Model Training → Model Evaluation → FastAPI → Docker → Amazon ECR → Amazon EC2
 
-- Reproducible synthetic customer churn dataset
-- AWS SSO authentication
-- Upload and download using boto3
-- SHA-256 integrity verification
-- Private S3 storage with SSE-S3 encryption
+### Features Implemented
 
-## Running Locally
+- Generated a reproducible synthetic customer churn dataset with 100 records.
+- Built an S3 pipeline for uploading and downloading datasets with SHA-256 integrity verification.
+- Implemented schema validation, data quality checks, and automated tests using pytest.
+- Trained and evaluated Logistic Regression models using accuracy, recall, and F1-score.
+- Implemented model versioning and experiment comparison.
+- Built a FastAPI inference service with input validation and a health-check endpoint.
+- Containerized the application using Docker and published the versioned image to Amazon ECR.
+- Deployed the Docker container on an Amazon EC2 t2.micro instance running Amazon Linux 2023.
+- Configured an IAM instance role, security group rules, SSH access, and Docker networking.
+- Verified application startup, HTTP health checks, Swagger UI access, and container resource utilization.
 
-1. Create and activate a Python virtual environment.
-2. Install dependencies using `pip install -r requirements.txt`.
-3. Configure an AWS CLI SSO profile named `mlops-dev`.
-4. Provision the required private S3 bucket with appropriate IAM permissions.
-5. Run `python create_dataset.py`.
-6. Run `python s3_pipeline.py`.
+### Deployment Details
 
-## Future Improvements
+| Component | Configuration |
+|---|---|
+| AWS Region | ap-south-1 (Mumbai) |
+| Compute | Amazon EC2 t2.micro |
+| Operating System | Amazon Linux 2023 |
+| Container Registry | Amazon ECR |
+| Image Version | churn-prediction-api:v1 |
+| Application | FastAPI |
+| Container Port | 8000 |
+| IAM | ECR read-only instance role |
 
-- ML model training
-- Docker containerization
-- Amazon ECR and ECS deployment
-- CI/CD
-- Model monitoring and retraining
+### Deployment Verification
 
-## AWS Cost Management
+The application started successfully and responded to HTTP health checks.
 
-AWS resources are created for temporary learning exercises and cleaned up afterward to minimize costs.
+Observed container resource usage during testing:
+
+- CPU: 0.14%
+- Memory: 162.4 MiB / 700 MiB
+- Memory utilization: 23.20%
+
+These measurements represent a single low-traffic observation, not a load test.
+
+### Cost Management
+
+The EC2 instance was stopped after deployment testing to avoid continued instance compute usage. EBS and ECR resources may continue to incur storage charges.
+
+### Future Improvements
+
+- Automated build and deployment with GitHub Actions
+- Model and application monitoring
+- CI/CD deployment workflow
+- Model retraining and deployment automation
+
+### Project Status
+
+**Completed:** Data pipeline, model training, evaluation, testing, containerization, ECR publishing, EC2 deployment, and API health verification.
+
+**Planned:** CI/CD, monitoring, and automated retraining.
